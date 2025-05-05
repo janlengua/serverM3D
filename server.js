@@ -11,75 +11,213 @@ admin.initializeApp({
 });
 
 const db = admin.firestore();
-const modelsCollection = db.collection('models');
+const buildingsCollection = db.collection('buildings');
+const floorsCollection = db.collection('floors');
+const formsCollection = db.collection('forms');
 
 app.use(cors());
 app.use(express.json());
 
-// GET all models
-app.get('/models', async (req, res) => {
-  try {
-    const snapshot = await modelsCollection.get();
-    const models = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    res.json(models);
-  } catch (error) {
-    res.status(500).send('Error getting models');
-  }
-});
+// --- BUILDINGS ---
 
-// GET single model by ID
-app.get('/models/:id', async (req, res) => {
+// Create building
+app.post('/buildings', async (req, res) => {
   try {
-    const doc = await modelsCollection.doc(req.params.id).get();
-    if (!doc.exists) return res.status(404).send('Model not found');
-    res.json({ id: doc.id, ...doc.data() });
-  } catch (error) {
-    res.status(500).send('Error getting model');
-  }
-});
-
-// POST create new model
-app.post('/models', async (req, res) => {
-  try {
-    const { url, label, visible = true } = req.body;
-    const docRef = await modelsCollection.add({ url, label, visible });
+    const { nombre, urlModelo, descripcion, activo = true } = req.body;
+    const docRef = await buildingsCollection.add({ nombre, urlModelo, descripcion, activo });
     const doc = await docRef.get();
     res.status(201).json({ id: doc.id, ...doc.data() });
   } catch (error) {
-    res.status(500).send('Error creating model');
+    res.status(500).send('Error creating building');
   }
 });
 
-// PUT update model
-app.put('/models/:id', async (req, res) => {
+// Get all buildings
+app.get('/buildings', async (req, res) => {
   try {
-    const { url, label, visible } = req.body;
-    const modelRef = modelsCollection.doc(req.params.id);
-    const doc = await modelRef.get();
-    if (!doc.exists) return res.status(404).send('Model not found');
-
-    await modelRef.update({ url, label, visible });
-    const updatedDoc = await modelRef.get();
-    res.json({ id: updatedDoc.id, ...updatedDoc.data() });
+    const snapshot = await buildingsCollection.get();
+    const buildings = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    res.json(buildings);
   } catch (error) {
-    res.status(500).send('Error updating model');
+    res.status(500).send('Error getting buildings');
   }
 });
 
-// DELETE model
-app.delete('/models/:id', async (req, res) => {
+// Get single building
+app.get('/buildings/:id', async (req, res) => {
   try {
-    const modelRef = modelsCollection.doc(req.params.id);
-    const doc = await modelRef.get();
-    if (!doc.exists) return res.status(404).send('Model not found');
-
-    await modelRef.delete();
+    const doc = await buildingsCollection.doc(req.params.id).get();
+    if (!doc.exists) return res.status(404).send('Building not found');
     res.json({ id: doc.id, ...doc.data() });
   } catch (error) {
-    res.status(500).send('Error deleting model');
+    res.status(500).send('Error getting building');
+  }
+});
+
+// Update building
+app.put('/buildings/:id', async (req, res) => {
+  try {
+    const { nombre, urlModelo, descripcion, activo } = req.body;
+    const docRef = buildingsCollection.doc(req.params.id);
+    const doc = await docRef.get();
+    if (!doc.exists) return res.status(404).send('Building not found');
+
+    await docRef.update({ nombre, urlModelo, descripcion, activo });
+    const updatedDoc = await docRef.get();
+    res.json({ id: updatedDoc.id, ...updatedDoc.data() });
+  } catch (error) {
+    res.status(500).send('Error updating building');
+  }
+});
+
+// Delete building
+app.delete('/buildings/:id', async (req, res) => {
+  try {
+    const docRef = buildingsCollection.doc(req.params.id);
+    const doc = await docRef.get();
+    if (!doc.exists) return res.status(404).send('Building not found');
+
+    await docRef.delete();
+    res.json({ id: doc.id, ...doc.data() });
+  } catch (error) {
+    res.status(500).send('Error deleting building');
+  }
+});
+
+// --- FLOORS ---
+
+// Create floor
+app.post('/floors', async (req, res) => {
+  try {
+    const { nombre, urlModelos = [], descripcion, activo = true, buildingId } = req.body;
+    const docRef = await floorsCollection.add({ nombre, urlModelos, descripcion, activo, buildingId });
+    const doc = await docRef.get();
+    res.status(201).json({ id: doc.id, ...doc.data() });
+  } catch (error) {
+    res.status(500).send('Error creating floor');
+  }
+});
+
+// Get all floors
+app.get('/floors', async (req, res) => {
+  try {
+    const snapshot = await floorsCollection.get();
+    const floors = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    res.json(floors);
+  } catch (error) {
+    res.status(500).send('Error getting floors');
+  }
+});
+
+// Get single floor
+app.get('/floors/:id', async (req, res) => {
+  try {
+    const doc = await floorsCollection.doc(req.params.id).get();
+    if (!doc.exists) return res.status(404).send('Floor not found');
+    res.json({ id: doc.id, ...doc.data() });
+  } catch (error) {
+    res.status(500).send('Error getting floor');
+  }
+});
+
+// Update floor
+app.put('/floors/:id', async (req, res) => {
+  try {
+    const { nombre, urlModelos, descripcion, activo, buildingId } = req.body;
+    const docRef = floorsCollection.doc(req.params.id);
+    const doc = await docRef.get();
+    if (!doc.exists) return res.status(404).send('Floor not found');
+
+    await docRef.update({ nombre, urlModelos, descripcion, activo, buildingId });
+    const updatedDoc = await docRef.get();
+    res.json({ id: updatedDoc.id, ...updatedDoc.data() });
+  } catch (error) {
+    res.status(500).send('Error updating floor');
+  }
+});
+
+// Delete floor
+app.delete('/floors/:id', async (req, res) => {
+  try {
+    const docRef = floorsCollection.doc(req.params.id);
+    const doc = await docRef.get();
+    if (!doc.exists) return res.status(404).send('Floor not found');
+
+    await docRef.delete();
+    res.json({ id: doc.id, ...doc.data() });
+  } catch (error) {
+    res.status(500).send('Error deleting floor');
+  }
+});
+
+// --- FORMS ---
+
+// Create form
+app.post('/forms', async (req, res) => {
+  try {
+    const { nombre, email, texto, buildingId } = req.body;
+    const docRef = await formsCollection.add({ nombre, email, texto, buildingId });
+    const doc = await docRef.get();
+    res.status(201).json({ id: doc.id, ...doc.data() });
+  } catch (error) {
+    res.status(500).send('Error creating form');
+  }
+});
+
+// Get all forms
+app.get('/forms', async (req, res) => {
+  try {
+    const snapshot = await formsCollection.get();
+    const forms = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    res.json(forms);
+  } catch (error) {
+    res.status(500).send('Error getting forms');
+  }
+});
+
+// Get single form
+app.get('/forms/:id', async (req, res) => {
+  try {
+    const doc = await formsCollection.doc(req.params.id).get();
+    if (!doc.exists) return res.status(404).send('Form not found');
+    res.json({ id: doc.id, ...doc.data() });
+  } catch (error) {
+    res.status(500).send('Error getting form');
+  }
+});
+
+// Update form
+app.put('/forms/:id', async (req, res) => {
+  try {
+    const { nombre, email, texto, buildingId } = req.body;
+    const docRef = formsCollection.doc(req.params.id);
+    const doc = await docRef.get();
+    if (!doc.exists) return res.status(404).send('Form not found');
+
+    await docRef.update({ nombre, email, texto, buildingId });
+    const updatedDoc = await docRef.get();
+    res.json({ id: updatedDoc.id, ...updatedDoc.data() });
+  } catch (error) {
+    res.status(500).send('Error updating form');
+  }
+});
+
+// Delete form
+app.delete('/forms/:id', async (req, res) => {
+  try {
+    const docRef = formsCollection.doc(req.params.id);
+    const doc = await docRef.get();
+    if (!doc.exists) return res.status(404).send('Form not found');
+
+    await docRef.delete();
+    res.json({ id: doc.id, ...doc.data() });
+  } catch (error) {
+    res.status(500).send('Error deleting form');
   }
 });
 
 app.listen(port, () => {
-  console.log(`API server running on http://localhost:${port}`);
+  console.log(`API server running on https://serverm3d.onrender.com/`);
 });
+
+module.exports = app;
