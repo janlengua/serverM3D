@@ -2,10 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
 const axios = require('axios');
-require('dotenv').config();
 
 const app = express();
-const port = process.env.PORT || 3001;
+const port = process.env.PORT;
 
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
@@ -19,7 +18,12 @@ const floorsCollection = db.collection('floors');
 const formsCollection = db.collection('forms');
 
 // Middleware
-app.use(cors());
+const corsOptions = {
+  origin: '*', // Permite cualquier dominio
+  credentials: true, // Permite enviar credenciales
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // --- Autenticación Middleware ---
@@ -280,10 +284,14 @@ app.delete('/user', authenticate, async (req, res) => {
     res.status(500).send('Error deleting user');
   }
 });
-
+app.use((req, res, next) => {
+  console.log(`Received request: ${req.method} ${req.originalUrl}`);
+  next();
+});
 // --- START SERVER ---
 app.listen(port, () => {
-  console.log(`API server running on http://localhost:${port}`);
+  console.log(`API server running`);
 });
+
 
 module.exports = app;
