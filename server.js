@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
 const axios = require('axios');
+require('dotenv').config();
+
 
 const app = express();
 const port = process.env.PORT;
@@ -11,7 +13,7 @@ const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
-
+console.log("API Key: ", serviceAccount);
 const db = admin.firestore();
 const buildingsCollection = db.collection('buildings');
 const floorsCollection = db.collection('floors');
@@ -230,8 +232,6 @@ app.delete('/forms/:id', authenticate, async (req, res) => {
   }
 });
 
-// --- USER AUTH ---
-
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -243,9 +243,11 @@ app.post('/login', async (req, res) => {
     });
     res.json({ token: response.data.idToken });
   } catch (err) {
-    res.status(401).send('Login failed');
+    console.error('Error details:', err.response ? err.response.data : err);
+    res.status(401).send(err.response ? err.response.data.error.message : 'Login failed');
   }
 });
+
 
 app.get('/user', authenticate, async (req, res) => {
   try {
