@@ -118,6 +118,17 @@
       res.status(500).send('Error getting floors', error);
     }
   });
+  // Obtener floors por buildingId (público)
+  app.get('/floors/building/:buildingId', async (req, res) => {
+    const { buildingId } = req.params;
+    try {
+      const snapshot = await floorsCollection.where('buildingId', '==', buildingId).get();
+      const floors = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      res.json(floors);
+    } catch (error) {
+      res.status(500).send('Error getting floors by buildingId');
+    }
+  });
 
   // Protegidas
   app.post('/floors', authenticate, async (req, res) => {
