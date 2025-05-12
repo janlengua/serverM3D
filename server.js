@@ -39,7 +39,7 @@
       req.user = decodedToken;
       next();
     } catch (err) {
-      res.status(401).send('Invalid token');
+      res.status(401).send('Invalid token', error);
     }
   };
 
@@ -52,7 +52,7 @@
       const buildings = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       res.json(buildings);
     } catch (error) {
-      res.status(500).send('Error getting buildings');
+      res.status(500).send('Error getting buildings', error);
     }
   });
 
@@ -64,7 +64,7 @@
       const doc = await docRef.get();
       res.status(201).json({ id: doc.id, ...doc.data() });
     } catch (error) {
-      res.status(500).send('Error creating building');
+      res.status(500).send('Error creating building: ', error);
     }
   });
 
@@ -74,7 +74,7 @@
       if (!doc.exists) return res.status(404).send('Building not found');
       res.json({ id: doc.id, ...doc.data() });
     } catch (error) {
-      res.status(500).send('Error getting building');
+      res.status(500).send('Error getting building', error);
     }
   });
 
@@ -89,7 +89,7 @@
       const updatedDoc = await docRef.get();
       res.json({ id: updatedDoc.id, ...updatedDoc.data() });
     } catch (error) {
-      res.status(500).send('Error updating building');
+      res.status(500).send('Error updating building', error);
     }
   });
 
@@ -102,7 +102,7 @@
       await docRef.delete();
       res.json({ id: doc.id, ...doc.data() });
     } catch (error) {
-      res.status(500).send('Error deleting building');
+      res.status(500).send('Error deleting building', error);
     }
   });
 
@@ -115,7 +115,7 @@
       const floors = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       res.json(floors);
     } catch (error) {
-      res.status(500).send('Error getting floors');
+      res.status(500).send('Error getting floors', error);
     }
   });
 
@@ -127,7 +127,7 @@
       const doc = await docRef.get();
       res.status(201).json({ id: doc.id, ...doc.data() });
     } catch (error) {
-      res.status(500).send('Error creating floor');
+      res.status(500).send('Error creating floor', error);
     }
   });
 
@@ -137,7 +137,7 @@
       if (!doc.exists) return res.status(404).send('Floor not found');
       res.json({ id: doc.id, ...doc.data() });
     } catch (error) {
-      res.status(500).send('Error getting floor');
+      res.status(500).send('Error getting floor', error);
     }
   });
 
@@ -152,7 +152,7 @@
       const updatedDoc = await docRef.get();
       res.json({ id: updatedDoc.id, ...updatedDoc.data() });
     } catch (error) {
-      res.status(500).send('Error updating floor');
+      res.status(500).send('Error updating floor', error);
     }
   });
 
@@ -165,7 +165,7 @@
       await docRef.delete();
       res.json({ id: doc.id, ...doc.data() });
     } catch (error) {
-      res.status(500).send('Error deleting floor');
+      res.status(500).send('Error deleting floor', error);
     }
   });
 
