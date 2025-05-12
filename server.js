@@ -59,8 +59,8 @@
   // Protegidas
   app.post('/buildings', authenticate, async (req, res) => {
     try {
-      const { nombre, urlModelo, descripcion, activo = true } = req.body;
-      const docRef = await buildingsCollection.add({ nombre, descripcion, urlModelo, urlWeb, latitud, logitud, ubicacion });
+      const { nombre, descripcion, urlModelo, urlWeb, latitud, longitud, ubicacion } = req.body;
+      const docRef = await buildingsCollection.add({ nombre, descripcion, urlModelo, urlWeb, latitud, longitud, ubicacion });
       const doc = await docRef.get();
       res.status(201).json({ id: doc.id, ...doc.data() });
     } catch (error) {
@@ -80,12 +80,12 @@
 
   app.put('/buildings/:id', authenticate, async (req, res) => {
     try {
-      const { nombre, descripcion, urlModelo, urlWeb, latitud, logitud, ubicacion } = req.body;
+      const { nombre, descripcion, urlModelo, urlWeb, latitud, longitud, ubicacion } = req.body;
       const docRef = buildingsCollection.doc(req.params.id);
       const doc = await docRef.get();
       if (!doc.exists) return res.status(404).send('Building not found');
 
-      await docRef.update({ nombre, descripcion, urlModelo, urlWeb, latitud, logitud, ubicacion });
+      await docRef.update({ nombre, descripcion, urlModelo, urlWeb, latitud, longitud, ubicacion });
       const updatedDoc = await docRef.get();
       res.json({ id: updatedDoc.id, ...updatedDoc.data() });
     } catch (error) {
