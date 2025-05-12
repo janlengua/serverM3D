@@ -134,7 +134,7 @@
   app.post('/floors', authenticate, async (req, res) => {
     try {
       const { nombre, urlModelos = [], descripcion, activo = true, buildingId } = req.body;
-      const docRef = await floorsCollection.add({ nombre, urlModelo, descripcion, activo, buildingId });
+      const docRef = await floorsCollection.add({ nombre, urlModelos, descripcion, activo, buildingId });
       const doc = await docRef.get();
       res.status(201).json({ id: doc.id, ...doc.data() });
     } catch (error) {
@@ -154,12 +154,12 @@
 
   app.put('/floors/:id', authenticate, async (req, res) => {
     try {
-      const { nombre, urlModelo, descripcion, activo, buildingId } = req.body;
+      const { nombre, urlModelos, descripcion, activo, buildingId } = req.body;
       const docRef = floorsCollection.doc(req.params.id);
       const doc = await docRef.get();
       if (!doc.exists) return res.status(404).send('Floor not found');
 
-      await docRef.update({ nombre, urlModelo, descripcion, activo, buildingId });
+      await docRef.update({ nombre, urlModelos, descripcion, activo, buildingId });
       const updatedDoc = await docRef.get();
       res.json({ id: updatedDoc.id, ...updatedDoc.data() });
     } catch (error) {
