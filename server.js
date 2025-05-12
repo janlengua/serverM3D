@@ -64,7 +64,7 @@
       const doc = await docRef.get();
       res.status(201).json({ id: doc.id, ...doc.data() });
     } catch (error) {
-      res.status(500).send('Error creating building: ', error);
+      res.status(500).send('Error creating building: '+ error);
     }
   });
 
@@ -74,7 +74,7 @@
       if (!doc.exists) return res.status(404).send('Building not found');
       res.json({ id: doc.id, ...doc.data() });
     } catch (error) {
-      res.status(500).send('Error getting building', error);
+      res.status(500).send('Error getting building'+ error);
     }
   });
 
@@ -115,7 +115,7 @@
       const floors = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       res.json(floors);
     } catch (error) {
-      res.status(500).send('Error getting floors', error);
+      res.status(500).send('Error getting floors'+ error);
     }
   });
   // Obtener floors por buildingId (público)
@@ -138,7 +138,7 @@
       const doc = await docRef.get();
       res.status(201).json({ id: doc.id, ...doc.data() });
     } catch (error) {
-      res.status(500).send('Error creating floor', error);
+      res.status(500).send('Error creating floor' + error);
     }
   });
 
